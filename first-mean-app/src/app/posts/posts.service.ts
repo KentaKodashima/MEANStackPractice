@@ -1,15 +1,25 @@
-import { Post } from './post.model'
 import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
+import { HttpClient } from '@angular/common/http'
+
+import { Post } from './post.model'
 
 @Injectable({ providedIn: 'root' })
 export class PostsService {
   private posts: Post[] = []
   private postsUpdated = new Subject<Post[]>()
 
+  constructor(private http: HttpClient) {}
+
   getPosts() {
     // Spread the original post to create a new array so that we don't mutate the original array
-    return [...this.posts]
+    // return [...this.posts]
+
+    this.http.get<{message: string, posts: Post[]}>('http://localhost:3000/api/posts')
+      .subscribe((postData) => {
+        this.posts = postData.posts
+        this.postsUpdated.next([...this.posts])
+      })
   }
 
   getPostUpdateListener() {
@@ -17,8 +27,12 @@ export class PostsService {
   }
 
   addPosts(title: string, content: string) {
-    const post: Post = { title, content }
-    this.posts.push(post)
-    this.postsUpdated.next([...this.posts])
+    const post: Post = { id: null, title, content }
+    this.http.post<{message: string}>('http://localhost:3000/api/posts', post)
+      .subscribe((response) => {
+        console.log(response.message)
+        this.posts.push(post)
+        this.postsUpdated.next([...this.posts])
+      })
   }
 }
