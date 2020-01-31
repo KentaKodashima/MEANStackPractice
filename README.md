@@ -276,5 +276,135 @@ export class PostListComponent {
   constructor(postsService: PostsService) {
   	this.postsService = postsService
   }
+  
 }
 ```
+
+## RXJS
+RXJS is suitable as a tool for subscripting to the copy of array and update the original array.
+
+<pre>
+// posts.service.ts
+
+// Subject is like a event emitter.
+// Something to observe.
+<b>import { Subject } from 'rxjs'</b>
+
+@Injectable({ providedIn: 'root' })
+export class PostsService {
+  ...
+  <b>private postsUpdated = new Subject<Post[]>()</b>
+
+  getPosts() {
+    ...
+  }
+
+  getPostUpdateListener() {
+    // Observable is something to subscribe to listen to the value changes.
+    return <b>this.postsUpdated.asObservable()</b>
+  }
+
+  addPosts(title: string, content: string) {
+    ...
+    // Push new array and emit values.
+    this.postsUpdated.next([...this.posts])
+  }
+}
+</pre>
+
+<pre>
+// posts.service.ts
+
+import { Component, <b>OnInit, OnDestroy</b> } from '@angular/core'
+<b>import { Subscription } from 'rxjs'</b>
+
+import { Post } from '../post.model'
+import { PostsService } from '../posts.service'
+
+@Component({
+  ...
+})
+export class PostListComponent implements <b>OnInit, OnDestroy</b> {
+  ...
+  <b>private postsSubscription: Subscription</b>
+
+  ...
+
+  ngOnInit() {
+    ...
+    <b>
+    this.postsSubscription = this.postsService.getPostUpdateListener()
+      .subscribe((posts: Post[]) => {
+        this.posts = posts
+      })
+    </b>
+  }
+
+  // Making sure there's no memory leak
+  //   when this component is not in the DOM.
+  ngOnDestroy() {
+    <b>this.postsSubscription.unsubscribe()</b>
+  }
+}
+</pre>
+
+## Observables (RXJS)
+
+### Observer
+Subscribe (listen) to Observables to receive data. Observers can use the following methods to get data.
+- next()
+- error()
+- complete()
+
+### Observable
+Passive object to observe. Events like next() cannot be triggered by code.
+
+### Subject
+Active object to observe. You can actively triger when the new data is emitted.
+
+## HTTP requests in Angular
+We can use `HttpClient` from `@angular/common/http` to setup a http client in Angular.
+
+`HttpClient` is created using Observable, so we need to call subscribe to get the response. Unlike default Observables from RXJS, Angular automatically unsubscribe when it is not in the DOM.
+
+<pre>
+...
+import { HttpClient } from '@angular/common/http'
+
+...
+
+@Injectable({ providedIn: 'root' })
+export class PostsService {
+  ...
+
+  <b>constructor(private http: HttpClient) {}</b>
+
+  getPosts() {
+    ...
+
+    this.http.get<{message: string, posts: Post[]}>('http://localhost:3000/api/posts')
+      .subscribe((postData) => {
+        this.posts = postData.posts
+      })
+  }
+
+  ...
+}
+</pre>
+
+## CORS
+CORS stands for Cross Origin Resource Sharing. It allows an app to communicate with the server on a different port. We can allow them in the server by configuring the request header.
+
+## NoSQL vs SQL
+
+### NoSQL
+- Enforces no data schema
+- Less focused on relations
+- Independent documents
+- Great for logs, orders, chat messages
+
+### SQL
+- Enforces a strict data schema
+- Relations are core feature
+- Records are related
+- Great for shopping carts, contacts, network
