@@ -408,3 +408,11 @@ CORS stands for Cross Origin Resource Sharing. It allows an app to communicate w
 - Relations are core feature
 - Records are related
 - Great for shopping carts, contacts, network
+
+## RXJS Operators
+The `.pipe()` method allow us to use the operators from RXJS.
+
+- `map()` operator  
+Just like the map() function ES, it runs on every element of an array that is emitted by an Observable and store them into an new array.
+
+Official documentation: [https://rxjs-dev.firebaseapp.com/api/operators/map](https://rxjs-dev.firebaseapp.com/api/operators/map)
