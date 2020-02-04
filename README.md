@@ -416,3 +416,77 @@ The `.pipe()` method allow us to use the operators from RXJS.
 Just like the map() function ES, it runs on every element of an array that is emitted by an Observable and store them into an new array.
 
 Official documentation: [https://rxjs-dev.firebaseapp.com/api/operators/map](https://rxjs-dev.firebaseapp.com/api/operators/map)
+
+## Routing
+Angular has `RouterModule` by default. Just like the other modules from `@angular/core`, we can import it in the `.module.ts` files.
+
+<pre>
+// angular.routing.module.ts
+
+import { NgModule } from '@angular/core'
+import { RouterModule, Routes } from '@angular/router'
+import { PostListComponent } from './posts/post-list/post-list.component'
+import { PostCreateComponent } from './posts/post-create/post-create.component'
+
+const routes: Routes = [
+  { path: '', component: PostListComponent },
+  { path: 'create', component: PostCreateComponent },
+]
+
+@NgModule({
+  // Register routes config to make Angular be aware of the routes
+  imports: [RouterModule.forRoot(routes)],
+  // Export the routes to import it in app.module.ts
+  exports: [RouterModule]
+})
+export class AppRoutingModule {}
+</pre>
+
+<pre>
+// app.module.ts
+
+...
+<b>import { AppRoutingModule } from './app.routing.module'</b>
+...
+
+@NgModule({
+  declarations: [
+    ...
+  ],
+  imports: [
+    ...
+    <b>AppRoutingModule</b>
+  ],
+  providers: [
+
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+</pre>
+
+Then, we can use `<router-outlet></router-outlet>` to actually inform the routers about the routes.
+
+```
+// app.component.html
+
+<app-header></app-header>
+<main>
+  <router-outlet></router-outlet>
+</main>
+```
+
+In order to use link to the routes, we use `<a routerLink="">`.
+
+```
+// header.component.html
+
+<mat-toolbar color="primary">
+  <span><a routerLink="/">My Message</a></span>
+  <ul>
+    <li>
+      <a routerLink="/create">New Post</a>
+    </li>
+  </ul>
+</mat-toolbar>
+```
