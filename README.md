@@ -490,3 +490,95 @@ In order to use link to the routes, we use `<a routerLink="">`.
   </ul>
 </mat-toolbar>
 ```
+
+### Same component for the different routes
+
+To use the sae component for different routes, we set a path just like the other paths.
+
+<pre>
+// app.routing.module.ts
+
+...
+
+const routes: Routes = [
+  ...
+  { path: <b>'edit/:postId'</b>, component: PostCreateComponent }
+]
+
+@NgModule({
+  ...
+})
+export class AppRoutingModule {}
+</pre>
+
+Using `ActivatedRoute` observable, we can get information about the active route.
+
+<pre>
+...
+import { ActivatedRoute, ParamMap } from '@angular/router'
+
+...
+
+@Component({
+  ...
+})
+export class PostCreateComponent implements OnInit {
+  // Properties
+  ...
+  private mode = 'create'
+  private postId: string
+
+  constructor(public postService: PostsService, <b>public route: ActivatedRoute<b>) {}
+  <b>
+  ngOnInit() {
+    this.route.paramMap.subscribe((paramMap: ParamMap) => {
+      if (paramMap.has('postId')) {
+        // Change the content depending on the postId parameter
+        this.postId = paramMap.get('postId')
+      } else {
+        this.mode = 'create'
+        this.postId = null
+      }
+    })
+  }
+  </b>
+
+  ...
+}
+</pre>
+
+Then, add `getPost()` to `postService` to fetch the post to edit.
+
+<pre>
+// posts.service.ts
+
+...
+
+@Injectable({ providedIn: 'root' })
+export class PostsService {
+  ...
+
+  // Get post to edit
+  getPost(id: string) {
+    return {...this.posts.find(post => post.id === id)}
+  }
+  
+  ...
+}
+</pre>
+
+In order to add a parameter to `routerLink`, we need to use `routerLink="['string', parameter]"` syntax.
+
+```
+// post-list.component.html
+
+<mat-accordion multi="true" *ngIf="posts.length > 0">
+  <mat-expansion-panel *ngFor="let post of posts">
+    ...
+      <a mat-button color="primary" [routerLink]="['/edit', post.id]">EDIT</a>
+      <button mat-button color="warn" (click)="onDelete(post.id)">DELETE</button>
+    ...
+  </mat-expansion-panel>
+</mat-accordion>
+<p class="info-text mat-body-1" *ngIf="posts.length <= 0">No posts</p>
+```
