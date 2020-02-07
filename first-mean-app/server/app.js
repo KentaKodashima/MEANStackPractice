@@ -25,7 +25,7 @@ app.use((req, res, next) => {
   )
   res.setHeader(
     'Access-Control-Allow-Methods',
-    'GET, POST, PATCH, DELETE, OPTIONS'
+    'GET, POST, PATCH, PUT, DELETE, OPTIONS'
   )
 
   next()
@@ -33,6 +33,7 @@ app.use((req, res, next) => {
 
 app.post('/api/posts', async (req, res, next) => {
   const post = new Post({
+    _id: req.body.id,
     title: req.body.title,
     content: req.body.content
   })
@@ -41,6 +42,16 @@ app.post('/api/posts', async (req, res, next) => {
     message: 'Post added successfully',
     postId: result.id
   })
+})
+
+app.patch('/api/posts/:id', async (req, res, next) => {
+  const { id, title, content } = req.param
+  const post = new Post({
+    title,
+    content
+  })
+  const result = await Post.updateOne({ _id: id }, post)
+  res.status(200).json({ message: 'Update successful' })
 })
 
 app.get('/api/posts', async (req, res, next) => {
