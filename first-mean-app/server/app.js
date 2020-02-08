@@ -3,7 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 
-const Post = require('./models/post')
+const postsRoutes = require('./routes/posts')
 
 const app = express()
 
@@ -31,41 +31,6 @@ app.use((req, res, next) => {
   next()
 })
 
-app.post('/api/posts', async (req, res, next) => {
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.content
-  })
-  const result = await post.save()
-  res.status(201).json({
-    message: 'Post added successfully',
-    postId: result.id
-  })
-})
-
-app.patch('/api/posts/:id', async (req, res, next) => {
-  const { id, title, content } = req.param
-  const post = new Post({
-    title,
-    content
-  })
-  const result = await Post.updateOne({ _id: id }, post)
-  res.status(200).json({ message: 'Update successful' })
-})
-
-app.get('/api/posts', async (req, res, next) => {
-  const posts = await Post.find()
-  res.status(200).json({
-    message: 'Post fetched successfully',
-    posts: posts
-  })
-})
-
-app.delete('/api/posts/delete/:id', async (req, res, next) => {
-  const result = await Post.deleteOne({ _id: req.params.id })
-  console.log(result)
-  res.status(200).json({ message: 'Post deleted successfully' })
-})
+app.use('/api/posts', postsRoutes)
 
 module.exports = app
