@@ -27,12 +27,17 @@ export class PostCreateComponent {
 ```
 
 ### Integrating with the co-responding html file
+Property binding can be done with `[target]="property"`.  
+Event listening can be done with `(event)="method"`.
+
 ```
 <!-- post-create.component.html -->
 
-<textarea rows="6" [value]="newPost"></textarea> // Property binding
+<!-- Property binding -->
+<textarea rows="6" [value]="newPost"></textarea>
 <hr>
-<button (click)="onAddPost()">Save post</button> // Listening events
+<!-- Listening events -->
+<button (click)="onAddPost()">Save post</button>
 <p>{{ newPost }}</p> // Outputting properties
 ```
 
@@ -581,4 +586,103 @@ In order to add a parameter to `routerLink`, we need to use `routerLink="['strin
   </mat-expansion-panel>
 </mat-accordion>
 <p class="info-text mat-body-1" *ngIf="posts.length <= 0">No posts</p>
+```
+
+## Proxy input event
+`#filePicker` is random name.
+```
+<div>
+  <button mat-stroked-button type="button" (click)="filePicker.ckick()">Pick Image</button>
+  <input type="file" #filePicker>
+</div>
+```
+
+## ReactiveFormsModule
+<pre>
+// post-create.component.ts
+
+...
+import { <b>ActivatedRoute</b>, ParamMap } from '@angular/router'
+
+...
+
+@Component({
+  ...
+})
+export class PostCreateComponent implements OnInit {
+  // Properties
+  ...
+  <b>form: FormGroup</b>
+  ...
+
+  constructor(
+    public postService:
+    PostsService, public route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    // Create a form programmatically
+    <b>
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        validators: [
+          Validators.required,
+          Validators.minLength(3)
+        ]
+      }),
+      content: new FormControl(null, {
+        validators: [
+          Validators.required
+        ]
+      }),
+    })
+    </b>
+    ...
+  }
+
+  onSavePost() {
+    ...
+    if (this.mode === 'create') {
+      this.postService.addPosts(this.form.value.title, this.form.value.content)
+    } else {
+      this.postService.updatePost(this.postId, this.form.value.title, this.form.value.content)
+    }
+
+    this.form.reset()
+  }
+}
+</pre>
+
+```
+<!-- post-create.component.html  -->
+
+<mat-card>
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading">
+    <mat-form-field>
+      <!-- Local reference #title="ngModel" -->
+      <input
+        matInput
+        type="text"
+        formControlName='title'
+        placeholder="Post Title"
+      >
+      ...
+    </mat-form-field>
+    <div>
+      ...
+    </div>
+    <mat-form-field>
+      <textarea
+        rows="6"
+        matInput
+        formControlName='content'
+        placeholder="Post Content"
+      ></textarea>
+      ...
+    </mat-form-field>
+    ...
+  </form>
+</mat-card>
+<hr>
 ```
