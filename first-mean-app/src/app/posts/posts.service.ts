@@ -24,7 +24,8 @@ export class PostsService {
           return {
             id: post._id,
             title: post.title,
-            content: post.content
+            content: post.content,
+            imagePath: post.imagePath
           }
         })
       }))
@@ -35,7 +36,7 @@ export class PostsService {
   }
 
   updatePost(id: string, title: string, content: string) {
-    const post: Post = { id, title, content }
+    const post: Post = { id, title, content, imagePath: null }
     this.http.patch(`http://localhost:3000/api/posts/${id}`, post)
       .subscribe(response => {
         const updatedPosts = [...this.posts]
@@ -61,12 +62,17 @@ export class PostsService {
     postData.append('title', title)
     postData.append('content', content)
     postData.append('image', image, title)
-    this.http.post<{message: string, postId: string}>(
+    this.http.post<{message: string, post: Post}>(
       'http://localhost:3000/api/posts',
       postData
     )
       .subscribe((response) => {
-        const post: Post = { id: response.postId, title, content }
+        const post: Post = {
+          id: response.post.id,
+          title,
+          content,
+          imagePath: response.post.imagePath
+        }
         this.posts.push(post)
         this.postsUpdated.next([...this.posts])
         this.router.navigate(['/'])

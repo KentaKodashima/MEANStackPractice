@@ -45,15 +45,20 @@ router.get('/:id', async (req, res, next) => {
 })
 
 router.post('', multer({ storage }).single('image'), async (req, res, next) => {
+  const url = req.protocol + '://' + req.get('host')
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + '/images/' + req.file.filename
   })
   const result = await post.save()
   res.status(201).json({
     message: 'Post added successfully',
-    postId: result.id
+    post: {
+      ...result,
+      id: result._id
+    }
   })
 })
 
