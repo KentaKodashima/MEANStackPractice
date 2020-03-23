@@ -62,13 +62,22 @@ router.post('', multer({ storage }).single('image'), async (req, res, next) => {
   })
 })
 
-router.patch('/:id', async (req, res, next) => {
-  const { id, title, content } = req.param
+router.patch('/:id', multer({ storage }).single('image'), async (req, res, next) => {
+  const { id, title, content } = req.body
+  let imagePath = req.body.imagePath
+
+  if (req.file) {
+    const url = req.protocol + '://' + req.get('host')
+    imagePath = `${url}/images/${req.file.filename}`
+  }
+
   const post = new Post({
+    _id: id,
     title,
-    content
+    content,
+    imagePath: imagePath
   })
-  const result = await Post.updateOne({ _id: id }, post)
+  await Post.updateOne({ _id: req.params.id }, post)
   res.status(200).json({ message: 'Update successful' })
 })
 
