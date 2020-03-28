@@ -687,3 +687,11 @@ export class PostCreateComponent implements OnInit {
 <hr>
 ```
 
+## Handling image path
+
+### Forwarding requests
+Forward requests to a specific route to grab data from a specific folder in backend server using `express.static` amd NodeJS's `path` module.
+
+```
+app.use("/images", express.static(path.join("server/images")))
+```
