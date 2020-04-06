@@ -36,7 +36,8 @@ router.get('', async (req, res, next) => {
   }
   res.status(200).json({
     message: 'Post fetched successfully',
-    posts: posts
+    posts: posts,
+    maxPosts: posts.length
   })
 })
 
