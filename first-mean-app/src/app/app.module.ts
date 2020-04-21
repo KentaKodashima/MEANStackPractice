@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { NgModule } from '@angular/core'
-import { ReactiveFormsModule } from '@angular/forms'
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { HttpClientModule } from '@angular/common/http'
 import {
   MatInputModule,
@@ -18,16 +18,19 @@ import { AppRoutingModule } from './app.routing.module'
 import { PostCreateComponent } from './posts/post-create/post-create.component'
 import { HeaderComponent } from './header/header.component'
 import { PostListComponent } from './posts/post-list/post-list.component'
+import { LoginComponent } from './auth/login/login.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     PostCreateComponent,
     HeaderComponent,
-    PostListComponent
+    PostListComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     ReactiveFormsModule,
     NoopAnimationsModule,
     MatInputModule,
@@ -38,7 +41,7 @@ import { PostListComponent } from './posts/post-list/post-list.component'
     MatExpansionModule,
     MatProgressSpinnerModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [
 
